@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-finetuning-app
+  namespace: llm-finetuning
+  labels:
+    app: llm-finetuning
+    component: app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: llm-finetuning
+      component: app
+  template:
+    metadata:
+      labels:
+        app: llm-finetuning
+        component: app
+        version: v1
+    spec:
+      containers:
+      - name: llm-finetuning
+        image: llm-finetuning:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        env:
+        - name: MODEL_PATH
+          value: "/app/models"
+        - name: DEVICE
+          value: "cuda"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: REDIS_URL
+          value: "redis://redis-service:6379"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-secret
+              key: url
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+            nvidia.com/gpu: 1
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+            nvidia.com/gpu: 2
+        volumeMounts:
+        - name: models
+          mountPath: /app/models
+          readOnly: true
+        - name: outputs
+          mountPath: /app/outputs
+        - name: logs
+          mountPath: /app/logs
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: models
+        persistentVolumeClaim:
+          claimName: models-pvc
+      - name: outputs
+        persistentVolumeClaim:
+          claimName: outputs-pvc
+      - name: logs
+        persistentVolumeClaim:
+          claimName: logs-pvc
+      nodeSelector:
+        accelerator: nvidia-tesla-v100
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
