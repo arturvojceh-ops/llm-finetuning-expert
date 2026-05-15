@@ -35,12 +35,11 @@ venv.bak/
 *.swo
 *~
 
-# OL
-
+# OS
 .DS_Store
 .DS_Store?
-._^
-/.Spotlight-V100
+._*
+.Spotlight-V100
 .Trashes
 ehthumbs.db
 Thumbs.db
@@ -51,49 +50,49 @@ logs/
 wandb/
 mlruns/
 *.log
-checkpoint//
+checkpoint*/
 *.ckpt
-
-.pt
+*.pt
 *.pth
-*.safetysors
+*.safetensors
 
 # Data
 datasets/
 data/raw/
 data/processed/
 *.csv
-*.jsono
 *.json
+*.jsonl
 *.parquet
 
 # Temporary
-.tmp
+*.tmp
 *.temp
 .cache/
 *.bak
 
 # Jupyter Notebook
 .ipynb_checkpoints
-*.ipynb
+# *.ipynb  # Uncomment to ignore all notebooks
 
 # Documentation build
-docs_build/
+docs/_build/
 docs/site/
 docs/.doctrees/
+
 # Testing
 .coverage
 htmlcov/
-.toc
+.tox/
 .pytest_cache/
 .cache/
 nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+
 # Model files
 *.bin
 *.model
-*.ggmo
-
-.gguf
+*.ggml
+*.gguf
