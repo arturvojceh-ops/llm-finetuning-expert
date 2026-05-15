@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-finetuning-service
+  namespace: llm-finetuning
+  labels:
+    app: llm-finetuning
+    component: app
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: llm-finetuning
+    component: app
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
