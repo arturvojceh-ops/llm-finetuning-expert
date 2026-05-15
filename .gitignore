@@ -1,0 +1,99 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+*.egg-info/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OL
+
+.DS_Store
+.DS_Store?
+._^
+/.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+outputs/
+logs/
+wandb/
+mlruns/
+*.log
+checkpoint//
+*.ckpt
+
+.pt
+*.pth
+*.safetysors
+
+# Data
+datasets/
+data/raw/
+data/processed/
+*.csv
+*.jsono
+*.json
+*.parquet
+
+# Temporary
+.tmp
+*.temp
+.cache/
+*.bak
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Documentation build
+docs_build/
+docs/site/
+docs/.doctrees/
+# Testing
+.coverage
+htmlcov/
+.toc
+.pytest_cache/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+# Model files
+*.bin
+*.model
+*.ggmo
+
+.gguf
