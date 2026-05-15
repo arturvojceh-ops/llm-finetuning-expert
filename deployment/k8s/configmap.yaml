@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-finetuning-config
+  namespace: llm-finetuning
+data:
+  MODEL_PATH: "/app/models"
+  DEVICE: "cuda"
+  LOG_LEVEL: "INFO"
+  BATCH_SIZE: "4"
+  MAX_NEW_TOKENS: "512"
+  QUANTIZATION: "4bit"
+  USE_FLASH_ATTENTION: "true"
+  USE_GRADIENT_CHECKPOINTING: "true"
