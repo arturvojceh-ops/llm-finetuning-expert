@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # Main application service
+  app:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    container_name: llm-finetuning-app
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_PATH=/app/models
+      - DEVICE=cuda
+      - LOG_LEVEL=INFO
+    volumes:
+      - ../models:/app/models
+      - ../outputs:/app/outputs
+      - ../logs:/app/logs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Monitoring service (WandB)
+  monitoring:
+    image: wandb/local
+    container_name: llm-finetuning-monitoring
+    ports:
+      - "8080:8080"
+    volumes:
+      - wandb-data:/wandb
+    restart: unless-stopped
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: llm-finetuning-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # PostgreSQL for metadata storage
+  postgres:
+    image: postgres:15-alpine
+    container_name: llm-finetuning-postgres
+    environment:
+      - POSTGRES_USER=llmuser
+      - POSTGRES_PASSWORD=llmpassword
+      - POSTGRES_DB=llmfinetuning
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # MLflow for experiment tracking
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.7.1
+    container_name: llm-finetuning-mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      - BACKEND_STORE=postgresql://llmuser:llmpassword@postgres:5432/mlflow
+      - DEFAULT_ARTIFACT_ROOT=s3://mlflow-artifacts
+    volumes:
+      - mlflow-data:/mlflow
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  wandb-data:
+  redis-data:
+  postgres-data:
+  mlflow-data:
+
+networks:
+  default:
+    name: llm-finetuning-network
